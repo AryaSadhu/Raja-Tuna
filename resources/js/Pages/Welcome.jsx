@@ -40,8 +40,11 @@ export default function Welcome({ auth, terakhirInput }) {
     };
 
     const bannerImages = [
-       "/images/productImage1.jpeg",
-       "/images/productImage2.jpeg",
+       "images/RajaTuna_Poster1_OceanBlue.png",
+       "images/RajaTuna_Poster2_KraftPromo.png",
+       "images/RajaTuna_Poster3_BaliElegant.png",
+       "images/RajaTuna_Poster4_BoldRed.png",
+       "images/RajaTuna_Poster5_MinimalTeal.png",
     ];
 
     return (
