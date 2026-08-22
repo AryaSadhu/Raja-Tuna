@@ -1,4 +1,4 @@
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayoutOld";
 import { Head, usePage, useForm, Link } from "@inertiajs/react";
 import { useState } from "react";
 import PrimaryButton from "@/Components/PrimaryButton";

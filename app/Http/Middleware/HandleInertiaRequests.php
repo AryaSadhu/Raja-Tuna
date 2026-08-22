@@ -46,6 +46,8 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user()
                     ? $request->user()->only(['id', 'username', 'role'])
                     : null,
+                
+                'pelanggan' => $request->user('pelanggan'),
             ],
             // Data ini akan bisa diakses di semua halaman React via usePage().props.globalEvent
             'globalEvent' => $activeEvent,

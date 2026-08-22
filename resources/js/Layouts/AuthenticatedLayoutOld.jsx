@@ -50,6 +50,8 @@ export default function AuthenticatedLayout({
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
     const user = auth ? auth.user : null;
+    // ✅ TAMBAHAN: data pelanggan yang sedang login (guard 'pelanggan')
+    const pelanggan = auth ? auth.pelanggan : null;
 
     const [currentActivity, setCurrentActivity] = useState(null);
 
@@ -190,9 +192,38 @@ export default function AuthenticatedLayout({
                                         </Dropdown.Link>
                                     </Dropdown.Content>
                                 </Dropdown>
+                            ) : pelanggan ? (
+                                // ✅ TAMBAHAN: pelanggan sudah login -> tampilkan icon user, bukan Login/Register
+                                <div className="flex items-center gap-4">
+                                    <Link
+                                        href={route("pelanggan.profile.edit")}
+                                        title={pelanggan.nama_lengkap ?? "Profil Saya"}
+                                        className="inline-flex items-center justify-center text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            strokeWidth={1.5}
+                                            stroke="currentColor"
+                                            className="h-8 w-8"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
+                                            />
+                                        </svg>
+                                    </Link>
+
+                                    <Lottie
+                                        animationData={fishJumping}
+                                        loop={true}
+                                        style={{ height: 120, width: 160 }}
+                                    />
+                                </div>
                             ) : (
                                 <div className="flex items-center gap-4">
-                                    {/* TAMBAHAN: Link Register & Login untuk pelanggan (pojok kanan atas) */}
                                     <Link
                                         href={route("pelanggan.login")}
                                         className="text-sm font-medium text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"
@@ -301,22 +332,31 @@ export default function AuthenticatedLayout({
         Check Pesanan
     </ResponsiveNavLink>
 
-                                {/* TAMBAHAN: Link Register & Login untuk pelanggan (mobile) */}
+                                {/* TAMBAHAN: Link Register & Login / Profil pelanggan (mobile) */}
                                 {!user && (
-                                    <>
+                                    pelanggan ? (
                                         <ResponsiveNavLink
-                                            href={route("pelanggan.login")}
-                                            active={route().current("pelanggan.login")}
+                                            href={route("pelanggan.profile.edit")}
+                                            active={route().current("pelanggan.profile.edit")}
                                         >
-                                            Login
+                                            Profil Saya
                                         </ResponsiveNavLink>
-                                        <ResponsiveNavLink
-                                            href={route("pelanggan.register")}
-                                            active={route().current("pelanggan.register")}
-                                        >
-                                            Register
-                                        </ResponsiveNavLink>
-                                    </>
+                                    ) : (
+                                        <>
+                                            <ResponsiveNavLink
+                                                href={route("pelanggan.login")}
+                                                active={route().current("pelanggan.login")}
+                                            >
+                                                Login
+                                            </ResponsiveNavLink>
+                                            <ResponsiveNavLink
+                                                href={route("pelanggan.register")}
+                                                active={route().current("pelanggan.register")}
+                                            >
+                                                Register
+                                            </ResponsiveNavLink>
+                                        </>
+                                    )
                                 )}
                             </>
                         )}

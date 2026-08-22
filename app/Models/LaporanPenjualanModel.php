@@ -15,11 +15,17 @@ class LaporanPenjualanModel extends Model
     'nama_lengkap', 'email', 'nomor_whatsapp', 'alamat_lengkap', 'catatan',
     'provinsi_id', 'provinsi_nama', 'kabupaten_id', 'kabupaten_nama',
     'kecamatan_id', 'kecamatan_nama', 'kurir', 'total_ongkir', 'total_bayar',
-    'product_id', 'qty', 'harga_satuan', 'total_harga', 'status', 'nomor_pesanan',
+    'product_id', 'qty', 'harga_satuan', 'total_harga', 'status', 'nomor_pesanan', 'pelanggan_id'
+
 ];
 
     public function product()
     {
         return $this->belongsTo(DataBarangModel::class, 'product_id');
+    }
+
+    public function pelanggan()
+    {
+        return $this->belongsTo(Pelanggan::class, 'pelanggan_id');
     }
 }

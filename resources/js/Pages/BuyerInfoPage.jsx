@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayoutOld';
 import { Head, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
@@ -47,16 +47,23 @@ export default function BuyerInfoPage({ auth, cart }) {
         kecamatan: '',
     });
 
+    // ✅ Data pelanggan yang sedang login (guard 'pelanggan'), kalau ada
+    const pelanggan = auth?.pelanggan ?? null;
+
     // ✅ Perbaikan: gunakan optional chaining + fallback string kosong
+    // ✅ TAMBAHAN: kalau pelanggan sedang login, prioritaskan data dari akunnya
+    //    (nama, email, whatsapp, alamat) supaya otomatis terisi.
+    //    Kalau tidak login sebagai pelanggan, perilaku lama tetap dipakai
+    //    (isi dari auth.user kalau ada, atau kosong).
     const [formData, setFormData] = useState({
-        nama_lengkap:   auth?.user?.name  ?? '',
-        email:          auth?.user?.email ?? '',
-        nomor_whatsapp: '',
+        nama_lengkap:   pelanggan?.nama_lengkap  ?? auth?.user?.name  ?? '',
+        email:          pelanggan?.email         ?? auth?.user?.email ?? '',
+        nomor_whatsapp: pelanggan?.nomor_whatsapp ?? '',
         provinsi_id:    '',
         kabupaten_id:   '',
         kecamatan_id:   '',
         kurir:          '',
-        alamat_lengkap: '',
+        alamat_lengkap: pelanggan?.alamat_lengkap ?? '',
         catatan:        '',
     });
 

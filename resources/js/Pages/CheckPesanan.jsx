@@ -1,9 +1,9 @@
 import { useState } from "react";
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, router } from '@inertiajs/react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayoutOld';
+import { Head, router } from '@inertiajs/react';
 import Swal from 'sweetalert2';
 
-export default function CheckPesanan({ auth, pesanan, not_found }) {
+export default function CheckPesanan({ auth, pesanan, not_found, pesanan_belum_bayar = [], pelanggan_login }) {
     const [orderId, setOrderId] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -39,7 +39,7 @@ export default function CheckPesanan({ auth, pesanan, not_found }) {
     };
 
     const handleKonfirmasiWA = () => {
-        const pesan = `Halo Admin, saya ingin konfirmasi pembayaran untuk Pesanan #${pesanan.id}. Total Transfer: Rp ${parseFloat(pesanan.total_bayar).toLocaleString('id-ID')}. Mohon dicek ya, terima kasih!`;
+        const pesan = `Halo Admin, saya ingin konfirmasi pembayaran untuk Pesanan #${pesanan.id}. Total Transfer: Rp ${parseFloat(pesanan.total_bayar ?? pesanan.total_harga).toLocaleString('id-ID')}. Mohon dicek ya, terima kasih!`;
         window.open(`https://wa.me/${noHpAdmin}?text=${encodeURIComponent(pesan)}`, '_blank');
     };
 
@@ -48,7 +48,7 @@ export default function CheckPesanan({ auth, pesanan, not_found }) {
             <Head title="Check Pesanan" />
 
             <div className="py-12 bg-gray-50/50 min-h-screen">
-                <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
                     
                     {/* INPUT FORM CARI */}
                     {!pesanan && (
@@ -74,18 +74,19 @@ export default function CheckPesanan({ auth, pesanan, not_found }) {
                             </form>
                         </div>
                     )} 
-                    {not_found && (
-    <div className="mt-4 bg-red-50 border border-red-100 rounded-2xl px-6 py-4 flex items-center gap-3">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <p className="text-xs font-bold text-red-500 uppercase tracking-widest">
-            Pesanan tidak ditemukan. Cek kembali nomor pesanan Anda.
-        </p>
-    </div>
-)}
 
-                    {/* HASIL PENCARIAN (Desain yang Anda minta) */}
+                    {not_found && (
+                        <div className="bg-red-50 border border-red-100 rounded-2xl px-6 py-4 flex items-center gap-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <p className="text-xs font-bold text-red-500 uppercase tracking-widest">
+                                Pesanan tidak ditemukan. Cek kembali nomor pesanan Anda.
+                            </p>
+                        </div>
+                    )}
+
+                    {/* HASIL PENCARIAN DETAIL PESANAN */}
                     {pesanan && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
@@ -106,7 +107,7 @@ export default function CheckPesanan({ auth, pesanan, not_found }) {
                                     <div className="text-center space-y-2">
                                         <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em]">Total yang harus dibayar</p>
                                         <h1 className="text-4xl font-black text-blue-600 italic">
-                                            Rp {parseFloat(pesanan.total_bayar).toLocaleString('id-ID')}
+                                            Rp {parseFloat(pesanan.total_bayar ?? pesanan.total_harga).toLocaleString('id-ID')}
                                         </h1>
                                     </div>
 
@@ -161,6 +162,83 @@ export default function CheckPesanan({ auth, pesanan, not_found }) {
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* TABEL DAFTAR PESANAN BELUM DIBAYAR */}
+                    {Boolean(pelanggan_login) && (
+                        <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                            <div className="p-8 border-b border-gray-100 flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-lg font-black text-gray-800 uppercase tracking-tight">Pesanan Anda Menunggu Pembayaran</h3>
+                                    <p className="text-xs text-gray-400 font-bold mt-1">Daftar transaksi Anda yang belum diselesaikan pembayarannya</p>
+                                </div>
+                                <span className="bg-amber-50 text-amber-600 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-amber-200">
+                                    {pesanan_belum_bayar?.length ?? 0} Menunggu
+                                </span>
+                            </div>
+
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse">
+                                    <thead className="bg-gray-50 border-b border-gray-100">
+                                        <tr>
+                                            <th className="p-4 font-bold text-gray-600 uppercase text-xs">ID Pesanan</th>
+                                            <th className="p-4 font-bold text-gray-600 uppercase text-xs">Tanggal</th>
+                                            <th className="p-4 font-bold text-gray-600 uppercase text-xs">Pelanggan</th>
+                                            <th className="p-4 font-bold text-gray-600 uppercase text-xs">Produk</th>
+                                            <th className="p-4 font-bold text-gray-600 uppercase text-xs text-center">Qty</th>
+                                            <th className="p-4 font-bold text-gray-600 uppercase text-xs">Total Bayar</th>
+                                            <th className="p-4 font-bold text-gray-600 uppercase text-xs text-center">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {pesanan_belum_bayar && pesanan_belum_bayar.length > 0 ? (
+                                            pesanan_belum_bayar.map((item) => (
+                                                <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                                                    <td className="p-4 text-xs font-black text-blue-600">
+                                                        #{item.id}
+                                                    </td>
+                                                    <td className="p-4 text-xs text-gray-500 font-medium">
+                                                        {new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                    </td>
+                                                    <td className="p-4">
+                                                        <div className="font-bold text-gray-800 text-xs">{item.nama_lengkap}</div>
+                                                        <div className="text-[10px] text-gray-400 font-bold">{item.nomor_whatsapp}</div>
+                                                    </td>
+                                                    <td className="p-4 text-sm text-gray-700">
+                                                        <div className="font-bold text-gray-800 text-xs">
+                                                            {item.product?.nama_barang ?? item.nama_barang ?? "Kerupuk Kulit Ikan Tuna"}
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4 text-xs text-center font-black text-gray-900">
+                                                        {item.qty} pcs
+                                                    </td>
+                                                    <td className="p-4 text-xs font-black text-gray-900">
+                                                        Rp {parseFloat(item.total_bayar ?? item.total_harga).toLocaleString('id-ID')}
+                                                    </td>
+                                                    <td className="p-4 text-center">
+                                                        <button
+                                                            onClick={() => {
+                                                                setOrderId(item.id.toString());
+                                                                router.get(route('pesanan.check'), { id: item.id }, { preserveState: true });
+                                                            }}
+                                                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase tracking-wider shadow-md shadow-blue-100 transition-all active:scale-95"
+                                                        >
+                                                            Bayar
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="7" className="p-8 text-center text-gray-400 text-xs italic font-medium">
+                                                    Tidak ada pesanan Anda yang menunggu pembayaran.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     )}

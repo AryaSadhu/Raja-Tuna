@@ -45,6 +45,11 @@ return [
             'driver' => 'session',
             'provider' => 'admins',
         ],
+
+        'pelanggan' => [
+            'driver'   => 'session',
+            'provider' => 'pelanggans',
+        ],
     ],
 
     /*
@@ -79,6 +84,10 @@ return [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
+        'pelanggans' => [
+            'driver' => 'eloquent',
+            'model'  => App\Models\Pelanggan::class,
+    ],
     ],
 
     /*

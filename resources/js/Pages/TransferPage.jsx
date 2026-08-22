@@ -1,11 +1,11 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayoutOld';
 import { Head, Link } from '@inertiajs/react';
 import { FaWhatsapp, FaCopy, FaCheckCircle } from 'react-icons/fa'; // Pastikan install react-icons atau ganti svg
 import Swal from 'sweetalert2';
 
 export default function TransferPage({ auth, total_bayar, order_id }) {
-    const noRekening = "0402334124";
-    const namaBank = "BANK CENTRAL ASIA (BCA)";
+    const noRekening = "39358081804042211";
+    const namaBank = " VIRTUAL ACCOUNT OVO";
     const namaPerusahaan = "PT. RAJA TUNA";
     const noHpAdmin = "6281804042211"; // Format internasional tanpa '+'
 
@@ -69,7 +69,7 @@ export default function TransferPage({ auth, total_bayar, order_id }) {
 
                                 <div className="space-y-4">
                                     <div>
-                                        <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-1">Nomor Rekening</p>
+                                        <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-1">NOMOR VIRTUAL ACCOUNT</p>
                                         <div className="flex items-center gap-3">
                                             <span className="text-2xl font-black text-gray-800 tracking-wider">{noRekening}</span>
                                             <button onClick={() => copyToClipboard(noRekening)} className="text-blue-500 hover:text-blue-700 transition-all p-2 bg-blue-50 rounded-xl">

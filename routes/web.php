@@ -26,7 +26,8 @@ use App\Http\Controllers\DaftarBarangCustomerController;
 use App\Http\Controllers\LaporanPenjualanController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\OngkirController;
-
+use App\Http\Controllers\Auth\PelangganAuthController;
+use App\Http\Controllers\PelangganProfileController;
 
 Route::get('/', [LandingPageController::class, 'index'])->name('home');
 
@@ -212,3 +213,32 @@ Route::post('/api/check-cost', [OngkirController::class, 'checkCost']);
 
 
 Route::get('/check-pesanan', [LaporanPenjualanController::class, 'checkPesanan'])->name('pesanan.check');
+
+
+Route::middleware('guest:pelanggan')->group(function () {
+    Route::get('/pelanggan/register', [PelangganAuthController::class, 'showRegister'])
+        ->name('pelanggan.register');
+    Route::post('/pelanggan/register', [PelangganAuthController::class, 'register']);
+
+    Route::get('/pelanggan/login', [PelangganAuthController::class, 'showLogin'])
+        ->name('pelanggan.login');
+    Route::post('/pelanggan/login', [PelangganAuthController::class, 'login']);
+});
+
+Route::middleware('auth:pelanggan')->group(function () {
+    Route::post('/pelanggan/logout', [PelangganAuthController::class, 'logout'])
+        ->name('pelanggan.logout');
+});
+
+Route::middleware('auth:pelanggan')->group(function () {
+    Route::post('/pelanggan/logout', [PelangganAuthController::class, 'logout'])
+        ->name('pelanggan.logout');
+
+    // Tambahan baru:
+    Route::get('/pelanggan/profile', [PelangganProfileController::class, 'edit'])
+        ->name('pelanggan.profile.edit');
+    Route::patch('/pelanggan/profile', [PelangganProfileController::class, 'update'])
+        ->name('pelanggan.profile.update');
+    Route::put('/pelanggan/profile/password', [PelangganProfileController::class, 'updatePassword'])
+        ->name('pelanggan.profile.password');
+});

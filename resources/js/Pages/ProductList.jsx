@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayoutOld';
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
 import Swal from 'sweetalert2';

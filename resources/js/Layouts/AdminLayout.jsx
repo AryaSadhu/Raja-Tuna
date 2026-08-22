@@ -133,7 +133,7 @@ export default function AdminLayout({ children }) {
                                     d="M15 5v2a2 2 0 002 2h2a2 2 0 012 2v6a2 2 0 01-2 2h-2a2 2 0 00-2 2v2m-6 0h6m-6 0H6a2 2 0 01-2-2v-2a2 2 0 00-2-2H0v-6h2a2 2 0 002-2V7a2 2 0 012-2h6z"
                                 />
                             </svg>
-                            Manage Kupon
+                            Manajemen Kupon
                         </Link>
                     </li>
 
@@ -153,7 +153,7 @@ export default function AdminLayout({ children }) {
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
         </svg>
-        Manage Barang
+        Manajemen Barang
     </Link>
 </li>
 

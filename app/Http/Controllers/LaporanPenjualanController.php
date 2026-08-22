@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use App\Mail\NotifikasiPesanan;
@@ -62,6 +63,12 @@ class LaporanPenjualanController extends Controller
             'items.*.qty'    => 'required|integer|min:1',
         ]);
 
+        // ✅ Kalau ada pelanggan yang sedang login (guard 'pelanggan'), hubungkan pesanan ini dengannya.
+        // Kalau tidak ada (checkout tanpa login), tetap null seperti sebelumnya — tidak mengubah alur lama.
+        $pelangganId = Auth::guard('pelanggan')->check()
+            ? Auth::guard('pelanggan')->id()
+            : null;
+
         $totalKeseluruhan = 0;
         $firstOrderId     = null;
 
@@ -78,6 +85,7 @@ class LaporanPenjualanController extends Controller
                 $totalKeseluruhan += $totalHarga;
 
                 $laporan = LaporanPenjualanModel::create([
+                    'pelanggan_id'   => $pelangganId,
                     'nama_lengkap'   => $validated['nama_lengkap'],
                     'email'          => $validated['email'],
                     'nomor_whatsapp' => $validated['nomor_whatsapp'],
@@ -174,22 +182,41 @@ public function checkPesanan(Request $request)
     $pesanan = null;
     $notFound = false;
 
-    if ($request->has('id') && $request->id !== '') {
-        // Cari berdasarkan nomor_pesanan (yang dikirim lewat email)
-        // ATAU berdasarkan id numerik sebagai fallback
-        $pesanan = LaporanPenjualanModel::with('product')
-            ->where('nomor_pesanan', $request->id)
-            ->orWhere('id', is_numeric($request->id) ? $request->id : -1)
-            ->first();
-
+    // 1. Jika user mencari berdasarkan ID manual
+    if ($request->filled('id')) {
+        $pesanan = LaporanPenjualanModel::with('product')->find($request->id);
         if (!$pesanan) {
             $notFound = true;
         }
     }
 
+    // 2. Ambil data pesanan 'belum dibayar' milik PELANGGAN yang login (guard: pelanggan)
+    $pesananBelumBayar = [];
+    $pelangganLogin = null;
+
+    if (Auth::guard('pelanggan')->check()) {
+        $pelanggan = Auth::guard('pelanggan')->user();
+        $pelangganLogin = $pelanggan; // dikirim ke frontend buat cek "sudah login apa belum"
+
+        $pesananBelumBayar = LaporanPenjualanModel::with('product')
+            ->where('status', 'belum dibayar')
+            ->where(function ($query) use ($pelanggan) {
+                $query->where('pelanggan_id', $pelanggan->id);
+
+                // fallback buat data lama yang mungkin belum kesimpan pelanggan_id-nya
+                if (\Schema::hasColumn('laporan_penjualans', 'email')) {
+                    $query->orWhere('email', $pelanggan->email);
+                }
+            })
+            ->latest()
+            ->get();
+    }
+
     return Inertia::render('CheckPesanan', [
-        'pesanan'   => $pesanan,
+        'pesanan' => $pesanan,
         'not_found' => $notFound,
+        'pesanan_belum_bayar' => $pesananBelumBayar,
+        'pelanggan_login' => $pelangganLogin, // prop baru, dedicated buat status login pelanggan
     ]);
 }
 }
